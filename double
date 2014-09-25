@@ -34,7 +34,7 @@ fi
 
 FOREGROUND_COMMAND=$*
 
-if [ $NEW_SID != "yes" ]; then
+if [ "$NEW_SID" != "yes" ]; then
 	setsid $0 -s -b "$BACKGROUND_COMMAND" $FOREGROUND_COMMAND
 else
 	# do execute
