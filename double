@@ -5,11 +5,17 @@ usage() {
 	exit 1
 }
 
-while getopts b:h OPT
+ORIGINAL_COMMAND=$*
+NEW_SID=
+
+while getopts b:sh OPT
 do
 	case $OPT in
 		b)
 			BACKGROUND_COMMAND=$OPTARG
+			;;
+		s)
+			NEW_SID="yes"
 			;;
 		h)
 			usage
@@ -28,4 +34,13 @@ fi
 
 FOREGROUND_COMMAND=$*
 
-setsid $(cd $(dirname $0); pwd)/double-internal "$BACKGROUND_COMMAND" "$FOREGROUND_COMMAND"
+if [ $NEW_SID != "yes" ]; then
+	setsid $0 -s -b "$BACKGROUND_COMMAND" $FOREGROUND_COMMAND
+else
+	# do execute
+	trap "exit" INT TERM
+	trap "kill 0" EXIT
+
+	$BACKGROUND_COMMAND &
+	$FOREGROUND_COMMAND
+fi
