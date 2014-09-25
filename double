@@ -22,16 +22,10 @@ shift $(($OPTIND - 1))
 if [ $# -eq 0 ]; then
 	usage
 fi
+if [ -z "$BACKGROUND_COMMAND" ]; then
+	usage
+fi
 
 FOREGROUND_COMMAND=$*
 
-wrapper() {
-	trap "exit" INT TERM
-	trap "kill 0" EXIT
-
-	$BACKGROUND_COMMAND &
-
-	$FOREGROUND_COMMAND
-}
-
-setsid wrapper
+setsid $(cd $(dirname $0); pwd)/double-internal "$BACKGROUND_COMMAND" "$FOREGROUND_COMMAND"
