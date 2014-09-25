@@ -15,6 +15,7 @@ do
 			BACKGROUND_COMMAND=$OPTARG
 			;;
 		s)
+			# hidden option
 			NEW_SID="yes"
 			;;
 		h)
