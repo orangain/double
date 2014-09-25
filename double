@@ -5,7 +5,6 @@ usage() {
 	exit 1
 }
 
-ORIGINAL_COMMAND=$*
 NEW_SID=
 
 while getopts b:sh OPT
