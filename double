@@ -1,45 +1,44 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-usage() {
-	echo "Usage: $0 -b \"Background Command\" Foreground-Command [args...]"
-	exit 1
-}
+from __future__ import print_function, unicode_literals
 
-NEW_SID=
+import os
+import argparse
+import subprocess
+import signal
+import atexit
 
-while getopts b:sh OPT
-do
-	case $OPT in
-		b)
-			BACKGROUND_COMMAND=$OPTARG
-			;;
-		s)
-			# hidden option
-			NEW_SID="yes"
-			;;
-		h)
-			usage
-			;;
-	esac
-done
 
-shift $(($OPTIND - 1))
+def main():
+    parser = argparse.ArgumentParser(
+        description='Execute a background process behind a foreground process.')
+    parser.add_argument('foreground', metavar='FOREGROUND_COMMAND',
+                        help='Foreground command')
+    parser.add_argument('args', nargs=argparse.REMAINDER,
+                        metavar='...', help='Foreground command args')
+    parser.add_argument('-b', '--background', dest='background', required=True,
+                        metavar='BACKGROUND_COMMAND', help='background proccess')
 
-if [ $# -eq 0 ]; then
-	usage
-fi
-if [ -z "$BACKGROUND_COMMAND" ]; then
-	usage
-fi
+    args = parser.parse_args()
 
-if [ "$NEW_SID" != "yes" ]; then
-	# start new session
-	setsid $0 -s -b "$BACKGROUND_COMMAND" "$@"
-else
-	# do execute
-	trap "exit" INT TERM
-	trap "kill 0" EXIT
+    # Create new process group
+    os.setpgrp()
 
-	eval "$BACKGROUND_COMMAND" &
-	"$@"
-fi
+    def kill_process_group():
+        try:
+            # kill whole process group
+            os.kill(0, signal.SIGINT)
+        except KeyboardInterrupt:
+            pass
+
+    atexit.register(kill_process_group)
+
+    try:
+        subprocess.Popen(args.background, shell=True)
+        subprocess.call([args.foreground] + args.args)
+    except KeyboardInterrupt:
+        pass
+
+
+if __name__ == '__main__':
+    main()
