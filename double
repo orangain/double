@@ -40,6 +40,6 @@ else
 	trap "exit" INT TERM
 	trap "kill 0" EXIT
 
-	$BACKGROUND_COMMAND &
+	eval "$BACKGROUND_COMMAND" &
 	"$@"
 fi
