@@ -17,7 +17,15 @@ e.g.
 double -b "vmstat 1 > vmstat.log" sleep 5
 ```
 
-Supported Environment
----------------------
+
+Requirements
+------------
+
+* Python 3.2+/2.7+
+
+
+Supported Platform
+------------------
 
 * Linux
+* Mac OS X
