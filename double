@@ -32,15 +32,14 @@ if [ -z "$BACKGROUND_COMMAND" ]; then
 	usage
 fi
 
-FOREGROUND_COMMAND=$*
-
 if [ "$NEW_SID" != "yes" ]; then
-	setsid $0 -s -b "$BACKGROUND_COMMAND" $FOREGROUND_COMMAND
+	# start new session
+	setsid $0 -s -b "$BACKGROUND_COMMAND" "$@"
 else
 	# do execute
 	trap "exit" INT TERM
 	trap "kill 0" EXIT
 
 	$BACKGROUND_COMMAND &
-	$FOREGROUND_COMMAND
+	"$@"
 fi
